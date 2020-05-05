@@ -18,10 +18,10 @@
                         <div class="col-md-2">
                             @guest()
                                 <button class="btn btn-outline-primary" type="submit" disabled >
-                                    <i class="fa fa-heart"></i> {{$news->countLike($news->id)}}
+                                    <i class="fa fa-thumbs-up"></i> {{$news->countLike($news->id)}}
                                 </button>
                                 <button class="btn btn-outline-primary" type="submit" disabled>
-                                    <i class="fa fa-thumbs-down"></i> {{count($news->getDislikes())}} 
+                                    <i class="fa fa-thumbs-down"></i> {{count($news->getDislikes())}}
                                 </button>
                             @else
                                 <form action="{{route('likeNews',['id'=>$news->id])}}" method="POST">

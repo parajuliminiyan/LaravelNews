@@ -26,7 +26,7 @@ class ApiResponse implements ResponsableInterface {
         $response = $this->client->get($this->baseUrl."/top-headlines", [
             'query' => [
                     'country' => $country,
-                    'apiKey' => env('ApiKey')
+                    'apiKey' => env('MIX_ApiKey')
                 ]
         ]);
         if($response->getStatusCode() >=200 && $response->getStatusCode() < 300){
@@ -44,7 +44,7 @@ class ApiResponse implements ResponsableInterface {
     {
         $response = $this->client->get($this->baseUrl."/everything",[
             'query' => [
-                'apiKey' => env('ApiKey'),
+                'apiKey' => env('MIX_ApiKey'),
                 'q' => $query
             ]
         ]);
@@ -55,7 +55,7 @@ class ApiResponse implements ResponsableInterface {
     {
         $response = $this->client->get($this->baseUrl."/sources",[
             'query' => [
-                'apiKey' => env('ApiKey')
+                'apiKey' => env('MIX_ApiKey')
             ]
         ]);
         return json_decode($response->getBody()->getContents())->sources;

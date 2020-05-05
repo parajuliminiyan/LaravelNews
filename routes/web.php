@@ -13,4 +13,9 @@
 
 Route::get('/', 'NewsController@getAllData');
 Route::get('/news/{source}', 'NewsController@index');
+Route::get('/news/{country}/country', 'NewsController@country');
 Route::get('news/{id}/details','NewsController@details');
+Route::post('news/like','NewsController@like')->name('likeNews');
+Auth::routes();
+
+Route::get('/home', 'HomeController@index')->name('home');

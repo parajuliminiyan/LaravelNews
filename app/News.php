@@ -12,8 +12,8 @@ class News extends Model
         return $this->hasMany(Likes::class);
     }
 
-    public  function getCategoty()
+    public function countLike($newsId)
     {
-        return $this->category;
+        return count(Likes::where('news_id', $newsId)->get());
     }
 }

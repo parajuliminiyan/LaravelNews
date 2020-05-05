@@ -22,7 +22,9 @@ class CreateNewsTable extends Migration
             $table->text('imageUrl')->nullable();
             $table->string('publishedAt')->nullable();
             $table->text('content')->nullable();
-            $table->string('category');
+            $table->string('category')->nullable();
+            $table->string('source')->nullable();
+            $table->string('country')->nullable();
             $table->timestamps();
         });
     }

@@ -24,36 +24,58 @@ class ApiResponse implements ResponsableInterface {
 
     public function getByCountry($country)
     {
-        $response = $this->client->get($this->baseUrl."/top-headlines", [
+        $response = $this->client->get($this->baseUrl . "/top-headlines", [
             'query' => [
-                    'country' => $country,
-                    'apiKey' => env('MIX_ApiKey')
-                ]
+                'country' => $country,
+                'apiKey' => env('MIX_ApiKey')
+            ]
         ]);
-        if($response->getStatusCode() >=200 && $response->getStatusCode() < 300){
-            return json_decode($response->getBody()->getContents())->articles;
+        $datas = json_decode($response->getBody()->getContents())->articles;
+        foreach ($datas as $data)
+        {
+            News::create([
+                'title' => $data->title,
+                'author' => $data->author,
+                'description' => $data->description,
+                'url' => $data->url,
+                'imageUrl' => $data->urlToImage,
+                'publishedAt' => $data->publishedAt,
+                'content' => $data->content,
+                'country' => $country
+            ]);
         }
-        return $response->getBody()->getContents();
+        return News::where('country', $country)->get();
     }
 
     public function getBySources($sources)
     {
-        $response = $this->client->get($this->baseUrl."/top-headlines", [
+        $response = $this->client->get($this->baseUrl . "/top-headlines", [
             'query' => [
                 'sources' => $sources,
                 'apiKey' => env('MIX_ApiKey')
             ]
         ]);
-        if($response->getStatusCode() >=200 && $response->getStatusCode() < 300){
-            return json_decode($response->getBody()->getContents())->articles;
+        $datas = json_decode($response->getBody()->getContents())->articles;
+        foreach ($datas as $data)
+        {
+            News::create([
+                'title' => $data->title,
+                'author' => $data->author,
+                'description' => $data->description,
+                'url' => $data->url,
+                'imageUrl' => $data->urlToImage,
+                'publishedAt' => $data->publishedAt,
+                'content' => $data->content,
+                'source' => $sources
+            ]);
         }
-        return $response->getBody()->getContents();
+        return News::where('source', $sources)->get();
 
     }
 
     public function getAll($query)
     {
-        $response = $this->client->get($this->baseUrl."/everything",[
+        $response = $this->client->get($this->baseUrl . "/everything", [
             'query' => [
                 'apiKey' => env('MIX_ApiKey'),
                 'q' => $query
@@ -63,14 +85,15 @@ class ApiResponse implements ResponsableInterface {
         foreach ($datas as $data)
         {
             News::create([
-                'title'=> $data->title,
+                'title' => $data->title,
                 'author' => $data->author,
                 'description' => $data->description,
                 'url' => $data->url,
                 'imageUrl' => $data->urlToImage,
                 'publishedAt' => $data->publishedAt,
                 'content' => $data->content,
-                'category' => $query
+                'category' => $query,
+                'source' => $data->source->id
             ]);
         }
         return News::where('category', $query)->get();
@@ -78,13 +101,24 @@ class ApiResponse implements ResponsableInterface {
 
     }
 
-    public  function getSources()
+    public function getSources()
     {
-        $response = $this->client->get($this->baseUrl."/sources",[
+        $response = $this->client->get($this->baseUrl . "/sources", [
             'query' => [
                 'apiKey' => env('MIX_ApiKey')
             ]
         ]);
         return json_decode($response->getBody()->getContents())->sources;
+    }
+
+    public function getValidCountries()
+    {
+        return $countryList = ['ae', 'ar', 'at', 'au', 'be', 'bg',
+            'br', 'ca', 'ch', 'cn', 'co', 'cu', 'cz', 'de', 'eg', 'fr', 'gb', 'gr', 'hk', 'hu',
+            'id', 'ie', 'il', 'in', 'it', 'jp', 'kr', 'lt', 'lv', 'ma', 'mx',
+            'my', 'ng',
+            'nl',
+            'no', 'nz', 'ph', 'pl',
+            'pt', 'ro', 'rs', 'ru', 'sa', 'se', 'sg', 'si', 'sk', 'th', 'tr', 'tw', 'ua', 'us', 've', 'za'];
     }
 }

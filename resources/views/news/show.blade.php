@@ -18,16 +18,16 @@
                         <div class="col-md-2">
                             @guest()
                                 <button class="btn btn-outline-primary" type="submit" disabled >
-                                    <i class="fa fa-heart"></i> {{$news->countLike($news->id)}} Likes
+                                    <i class="fa fa-heart"></i> {{$news->countLike($news->id)}}
                                 </button>
                                 <button class="btn btn-outline-primary" type="submit" disabled>
-                                    <i class="fa fa-thumbs-down"></i> {{count($news->getDislikes())}} Dislike
+                                    <i class="fa fa-thumbs-down"></i> {{count($news->getDislikes())}} 
                                 </button>
                             @else
                                 <form action="{{route('likeNews',['id'=>$news->id])}}" method="POST">
                                     @csrf
                                     <button class="btn btn-outline-primary" type="submit"  >
-                                        <i class="fa fa-thumbs-up"></i> {{count($news->getLikes())}} 
+                                        <i class="fa fa-thumbs-up"></i> {{count($news->getLikes())}}
                                     </button>
                                 </form>
                                 <form action="{{route('dislikeNews',['id'=>$news->id])}}" method="POST">

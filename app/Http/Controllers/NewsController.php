@@ -41,10 +41,24 @@ class NewsController extends Controller
     public function like()
     {
         $news_id = \request('id');
-        Likes::create([
-            'user_id' => auth()->user()->id,
-            'news_id' => $news_id
-        ]);
+
+       if(!$this->hasLiked($news_id)){
+
+           Likes::create([
+               'user_id' => auth()->user()->id,
+               'news_id' => $news_id
+           ]);
+       }
         return redirect()->back();
     }
+
+    /**
+     * @param $news_id
+     * @return mixed
+     */
+    protected function hasLiked($news_id)
+    {
+        return Likes::where('news_id', $news_id)->where('user_id', auth()->user()->id)->first();
+    }
+
 }

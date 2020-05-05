@@ -26,3 +26,11 @@ $factory->define(User::class, function (Faker $faker) {
         'remember_token' => Str::random(10),
     ];
 });
+$factory->define(\App\News::class, function (Faker $faker) {
+    return [
+        'author' => $faker->name,
+        'title' => $faker->sentence,
+        'description' => $faker->paragraph,
+        'url' => $faker->url, // password
+    ];
+});

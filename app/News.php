@@ -7,10 +7,11 @@ use Illuminate\Database\Eloquent\Model;
 class News extends Model
 {
     protected $guarded= [];
-    public function Likes()
+    public function likes()
     {
         return $this->hasMany(Likes::class);
     }
+
 
     public function countLike($newsId)
     {

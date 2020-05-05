@@ -8,8 +8,13 @@ class Likes extends Model
 {
     protected $guarded = [];
 
-    public function News()
+    public function news()
     {
-        return $this->belongsTo(News::class);
+        return $this->belongsTo(News::class)->first();
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class)->first();
     }
 }

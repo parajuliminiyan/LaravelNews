@@ -17,5 +17,6 @@ Route::get('/news/{country}/country', 'NewsController@country');
 Route::get('news/{id}/details','NewsController@details');
 Auth::routes();
 Route::post('news/like','NewsController@like')->name('likeNews');
+Route::post('news/dislike','NewsController@dislike')->name('dislikeNews');
 
 Route::get('/home', 'HomeController@index')->name('home');

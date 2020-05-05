@@ -17,6 +17,7 @@ class CreateLikesTable extends Migration
             $table->bigIncrements('id');
             $table->unsignedBigInteger('user_id');
             $table->unsignedBigInteger('news_id');
+            $table->enum('type', ['like','dislike'])->default('like');
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->foreign('news_id')->references('id')->on('news')->onDelete('cascade');
             $table->timestamps();

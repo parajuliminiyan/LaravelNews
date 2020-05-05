@@ -42,13 +42,35 @@ class NewsController extends Controller
     {
         $news_id = \request('id');
 
-       if(!$this->hasLiked($news_id)){
+        if($this->hasLiked($news_id) !== false){
+            $like = $this->hasLiked($news_id);
+            $like->type = 'like';
+            $like->save();
+        }else{
+            $like = new Likes();
+            $like->user_id = auth()->id();
+            $like->news_id = $news_id;
+            $like->type = 'like';
+            $like->save();
+        }
+        return redirect()->back();
+    }
 
-           Likes::create([
-               'user_id' => auth()->user()->id,
-               'news_id' => $news_id
-           ]);
-       }
+    public function dislike()
+    {
+        $news_id = \request('id');
+
+        if($this->hasLiked($news_id) !== false){
+            $like = $this->hasLiked($news_id);
+            $like->type = 'dislike';
+            $like->save();
+        }else{
+            $like = new Likes();
+            $like->user_id = auth()->id();
+            $like->news_id = $news_id;
+            $like->type = 'dislike';
+            $like->save();
+        }
         return redirect()->back();
     }
 
@@ -58,7 +80,8 @@ class NewsController extends Controller
      */
     protected function hasLiked($news_id)
     {
-        return Likes::where('news_id', $news_id)->where('user_id', auth()->user()->id)->first();
+        $likes =  Likes::where('news_id', $news_id)->where('user_id', auth()->user()->id)->first();
+        return ( $likes ) ? $likes : false;
     }
 
 }

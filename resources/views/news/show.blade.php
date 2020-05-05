@@ -20,13 +20,22 @@
                                 <button class="btn btn-outline-primary" type="submit" disabled >
                                     <i class="fa fa-heart"></i> {{$news->countLike($news->id)}} Likes
                                 </button>
-                            @else
-                            <form action="{{route('likeNews',['id'=>$news->id])}}" method="POST">
-                                @csrf
-                                <button class="btn btn-outline-primary" type="submit"  >
-                                    <i class="fa fa-heart"></i> {{$news->countLike($news->id)}} Likes
+                                <button class="btn btn-outline-primary" type="submit" disabled>
+                                    <i class="fa fa-thumbs-down"></i> {{count($news->getDislikes())}} Dislike
                                 </button>
-                            </form>
+                            @else
+                                <form action="{{route('likeNews',['id'=>$news->id])}}" method="POST">
+                                    @csrf
+                                    <button class="btn btn-outline-primary" type="submit"  >
+                                        <i class="fa fa-thumbs-up"></i> {{count($news->getLikes())}} 
+                                    </button>
+                                </form>
+                                <form action="{{route('dislikeNews',['id'=>$news->id])}}" method="POST">
+                                    @csrf
+                                    <button class="btn btn-outline-primary" type="submit">
+                                        <i class="fa fa-thumbs-down"></i> {{count($news->getDislikes())}}
+                                    </button>
+                                </form>
                             @endguest
                         </div>
                         <img class="card-img-top" src="{{$news->imageUrl}}" alt="Card image cap">

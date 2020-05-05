@@ -4,6 +4,7 @@
 namespace App\Http\Helper;
 
 
+use App\News;
 use GuzzleHttp\Client;
 
 class ApiResponse implements ResponsableInterface {
@@ -37,6 +38,16 @@ class ApiResponse implements ResponsableInterface {
 
     public function getBySources($sources)
     {
+        $response = $this->client->get($this->baseUrl."/top-headlines", [
+            'query' => [
+                'sources' => $sources,
+                'apiKey' => env('MIX_ApiKey')
+            ]
+        ]);
+        if($response->getStatusCode() >=200 && $response->getStatusCode() < 300){
+            return json_decode($response->getBody()->getContents())->articles;
+        }
+        return $response->getBody()->getContents();
 
     }
 
@@ -48,7 +59,23 @@ class ApiResponse implements ResponsableInterface {
                 'q' => $query
             ]
         ]);
-        return json_decode($response->getBody()->getContents())->articles;
+        $datas = json_decode($response->getBody()->getContents())->articles;
+        foreach ($datas as $data)
+        {
+            News::create([
+                'title'=> $data->title,
+                'author' => $data->author,
+                'description' => $data->description,
+                'url' => $data->url,
+                'imageUrl' => $data->urlToImage,
+                'publishedAt' => $data->publishedAt,
+                'content' => $data->content,
+                'category' => $query
+            ]);
+        }
+        return News::where('category', $query)->get();
+
+
     }
 
     public  function getSources()

@@ -27,7 +27,7 @@ Vue.config.productionTip = false
 // files.keys().map(key => Vue.component(key.split('/').pop().split('.')[0], files(key).default))
 
 // Vue.component('example-component', require('./components/ExampleComponent.vue').default);
-Vue.component('app', require('./components/App').default);
+Vue.component('app', require('./components/AllNews').default);
 Vue.component('contents', require('./components/Content').default);
 
 /**

@@ -11,10 +11,6 @@
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
-Route:
-Auth::routes();
-
-Route::get('/home', 'HomeController@index')->name('home');
+Route::get('/', 'NewsController@getAllData');
+Route::get('/news/{source}', 'NewsController@index');
+Route::get('news/{id}/details','NewsController@details');

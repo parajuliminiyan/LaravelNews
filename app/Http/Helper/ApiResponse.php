@@ -5,120 +5,125 @@ namespace App\Http\Helper;
 
 
 use App\News;
+use App\Sources;
 use GuzzleHttp\Client;
 
 class ApiResponse implements ResponsableInterface {
 
     private $baseUrl = "https://newsapi.org/v2";
     protected $client;
+    /**
+     * @var DBHelperInterface
+     */
+    private $helper;
 
     /**
      * ApiResponse constructor.
-     * @param string $baseUrl
+     * @param DBHelperInterface $helper
      */
     public function __construct()
     {
         $this->client = new Client();
+        $this->helper = new DBHelper();
     }
 
 
     public function getByCountry($country)
     {
-        $response = $this->client->get($this->baseUrl . "/top-headlines", [
-            'query' => [
-                'country' => $country,
-                'apiKey' => env('MIX_ApiKey')
-            ]
-        ]);
-        $datas = json_decode($response->getBody()->getContents())->articles;
-        foreach ($datas as $data)
-        {
-            News::create([
-                'title' => $data->title,
-                'author' => $data->author,
-                'description' => $data->description,
-                'url' => $data->url,
-                'imageUrl' => $data->urlToImage,
-                'publishedAt' => $data->publishedAt,
-                'content' => $data->content,
-                'country' => $country
-            ]);
+        if(count(News::where('country', $country)->get()) >0){
+            return News::where('country', $country)->get();
         }
+        $response = $this->getResponse($country,'/top-headlines');
+        $datas = json_decode($response->getBody()->getContents())->articles;
+        $this->helper->saveToDatabase($datas, null, null, $country);
         return News::where('country', $country)->get();
     }
 
     public function getBySources($sources)
     {
-        $response = $this->client->get($this->baseUrl . "/top-headlines", [
-            'query' => [
-                'sources' => $sources,
-                'apiKey' => env('MIX_ApiKey')
-            ]
-        ]);
-        $datas = json_decode($response->getBody()->getContents())->articles;
-        foreach ($datas as $data)
-        {
-            News::create([
-                'title' => $data->title,
-                'author' => $data->author,
-                'description' => $data->description,
-                'url' => $data->url,
-                'imageUrl' => $data->urlToImage,
-                'publishedAt' => $data->publishedAt,
-                'content' => $data->content,
-                'source' => $sources
-            ]);
+        if(count(News::where('source', $sources)->get()) >0){
+            return News::where('source', $sources)->get();
         }
+        $response = $this->getResponse($sources,'/top-headlines');
+        $datas = json_decode($response->getBody()->getContents())->articles;
+        $this->helper->saveToDatabase($datas, null, $sources);
         return News::where('source', $sources)->get();
 
     }
 
     public function getAll($query)
     {
-        $response = $this->client->get($this->baseUrl . "/everything", [
-            'query' => [
-                'apiKey' => env('MIX_ApiKey'),
-                'q' => $query
-            ]
-        ]);
-        $datas = json_decode($response->getBody()->getContents())->articles;
-        foreach ($datas as $data)
-        {
-            News::create([
-                'title' => $data->title,
-                'author' => $data->author,
-                'description' => $data->description,
-                'url' => $data->url,
-                'imageUrl' => $data->urlToImage,
-                'publishedAt' => $data->publishedAt,
-                'content' => $data->content,
-                'category' => $query,
-                'source' => $data->source->id
-            ]);
+        if(count(News::where('category', $query)->get())> 0){
+            return News::where('category', $query)->get();
         }
+        $response = $this->getResponse($query, '/everything');
+        $datas = json_decode($response->getBody()->getContents())->articles;
+        $this->helper->saveToDatabase($datas, $query);
         return News::where('category', $query)->get();
-
-
     }
-
-    public function getSources()
-    {
-        $response = $this->client->get($this->baseUrl . "/sources", [
-            'query' => [
-                'apiKey' => env('MIX_ApiKey')
-            ]
-        ]);
-        return json_decode($response->getBody()->getContents())->sources;
-    }
-
     public function getValidCountries()
     {
         return $countryList = ['ae', 'ar', 'at', 'au', 'be', 'bg',
-            'br', 'ca', 'ch', 'cn', 'co', 'cu', 'cz', 'de', 'eg', 'fr', 'gb', 'gr', 'hk', 'hu',
-            'id', 'ie', 'il', 'in', 'it', 'jp', 'kr', 'lt', 'lv', 'ma', 'mx',
-            'my', 'ng',
-            'nl',
-            'no', 'nz', 'ph', 'pl',
-            'pt', 'ro', 'rs', 'ru', 'sa', 'se', 'sg', 'si', 'sk', 'th', 'tr', 'tw', 'ua', 'us', 've', 'za'];
+            'br', 'ca', 'ch', 'cn', 'co', 'cu', 'cz', 'de', 'eg',
+            'fr', 'gb', 'gr', 'hk', 'hu', 'id', 'ie', 'il', 'in',
+            'it', 'jp', 'kr', 'lt', 'lv', 'ma', 'mx', 'my', 'ng',
+            'nl', 'no', 'nz', 'ph', 'pl', 'pt', 'ro', 'rs', 'ru',
+            'sa', 'se', 'sg', 'si', 'sk', 'th', 'tr', 'tw', 'ua',
+            'us', 've', 'za'];
+    }
+
+    /**
+     * @param $queryParams
+     * @param $urlLiterals
+     * @return \Psr\Http\Message\ResponseInterface
+     * @throws \Exception
+     */
+    protected function getResponse($queryParams, $urlLiterals): \Psr\Http\Message\ResponseInterface
+    {
+        if($urlLiterals == "/sources"){
+            try{
+                return $this->client->get($this->baseUrl . $urlLiterals, [
+                    'query' => [
+                        'apiKey' => env('MIX_ApiKey')
+                    ]
+                ]);
+            } catch (\Exception $exception){
+                throw $exception;
+            }
+        }
+        if(in_array($queryParams, $this->getValidCountries())){
+            return $this->client->get($this->baseUrl . $urlLiterals, [
+                'query' => [
+                    'country' => $queryParams,
+                    'apiKey' => env('MIX_ApiKey')
+                ]
+            ]);
+        }
+        if(in_array($queryParams, $this->getSources())){
+            return $this->client->get($this->baseUrl . $urlLiterals, [
+                'query' => [
+                    'sources' => $queryParams,
+                    'apiKey' => env('MIX_ApiKey')
+                ]
+            ]);
+        }
+         return $this->client->get($this->baseUrl .$urlLiterals, [
+            'query' => [
+                'apiKey' => env('MIX_ApiKey'),
+                'q' => $queryParams
+            ]
+        ]);
+    }
+    public function getSources()
+    {
+        if(count(Sources::all())> 0){
+            return Sources::all();
+        }
+        $response = $this->getResponse(null,'/sources');
+        $sources = json_decode($response->getBody()->getContents())->sources;
+        $helper = new DBHelper();
+        $helper->saveSources($sources);
+        dd(Sources::all());
+        return Sources::all();
     }
 }
